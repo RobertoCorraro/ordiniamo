@@ -29,7 +29,7 @@
             "bob__menu_prodotto flex flex-row w-full justify-between gap-x-6 py-5";
 
           box.innerHTML = `
-          <label class="bob__menu_prodotto_input_label w-70 border-2 bg-white mt-6 p-3 rounded shadow flex flex-col justify-between items-center space-y-2 text-center bob__menu_prodotto_label">
+          <label class="bob__menu_prodotto_input_label w-4/5 border-2 bg-white mt-6 p-3 rounded shadow flex flex-col justify-between items-center space-y-2 text-center bob__menu_prodotto_label">
             <input type="checkbox" id="check-${
               item.id
             }" class="mr-2 bob__menu_prodotto_input" onchange="toggleQuantity('${item.id}')">
