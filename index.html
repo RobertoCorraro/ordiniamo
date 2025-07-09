@@ -1,0 +1,298 @@
+<!-- Versione: 1.2 - 09 luglio 2025 -->
+<!-- 🍩 Ordini Ufficio BAR con griglia prodotti, quantità, split alla romana e prodotti personalizzati -->
+
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ordina dal Bar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen p-4 bob__body">
+    <!-- 🧾 TITOLO -->
+    <h1 class="text-2xl font-bold text-center mt-20 mb-6 bob__title">☕ Il Baaaaaaaar</h1>
+
+    <!-- 📦 CONTAINER PRINCIPALE -->
+    <div class="max-w-2xl mx-auto bob__container">
+      <!-- 🍽️ SEZIONE MENU A GRIGLIA -->
+      <div id="menu" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bob__menu"></div>
+
+      <!-- 🧮 SWITCH DIVISIONE ALLA ROMANA -->
+      <div class="flex items-center space-x-3 mb-4 bob__split">
+        <label for="splitToggle" class="font-medium w-[70%] bob__split_label">Non lo so, chissà servisse dividere alla romana, clicca qui.</label>
+        <input type="checkbox" id="splitToggle" class="h-5 w-5 bob__split_toggle" title="Dividi alla romana?" />
+      </div>
+
+      <!-- 👥 NUMERO PERSONE -->
+      <div id="splitControls" class="hidden flex items-center space-x-2 mb-6 bob__split_controls">
+        <span class="bob__split_controls_label">👥 Persone:</span>
+        <button onclick="adjustPeople(-1)" class="px-2 py-1 bg-gray-300 rounded bob__split_controls_btn">
+          -
+        </button>
+        <span id="peopleCount" class="font-bold bob__split_controls_count">2</span>
+        <button onclick="adjustPeople(1)" class="px-2 py-1 bg-gray-300 rounded bob__split_controls_btn">
+          +
+        </button>
+      </div>
+
+      <!-- 🛒 CARRELLO -->
+      <div class="bg-white p-4 rounded shadow space-y-3 mb-6 bob__cart">
+        <h2 class="text-lg font-semibold mb-2 bob__cart_title">🛒 Carrello</h2>
+        <div id="cartItems" class="space-y-1 text-sm bob__cart_items min-h-100">
+          <!-- Gli elementi del carrello verranno aggiunti qui dinamicamente -->
+        </div>
+        <p class="bob__cart_total">
+          <strong>TOT:</strong> €<span id="total" class="bob__cart_total_value">0.00</span>
+        </p>
+        <div id="splitInfo" class="hidden bob__cart_splitinfo">
+          <p class="bob__cart_splitinfo_text">
+            <strong>Totale per persona:</strong> €<span id="splitTotal" class="bob__cart_splitinfo_value"
+              >0.00</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- ➕ PRODOTTO PERSONALIZZATO -->
+      <div class="mb-6 bob__custom">
+        <button
+          onclick="toggleCustomFields()"
+          class="bg-yellow-400 text-black px-3 py-1 rounded bob__custom_btn"
+        >
+          ➕ Aggiungi prodotto personalizzato
+        </button>
+        <div id="customFields" class="mt-3 hidden space-y-2 bob__custom_fields">
+          <input
+            type="text"
+            id="customName"
+            placeholder="Nome prodotto"
+            class="w-full p-2 border rounded bob__custom_fields_input"
+          />
+          <input
+            type="number"
+            id="customPrice"
+            placeholder="Prezzo (€)"
+            class="w-full p-2 border rounded bob__custom_fields_input"
+            step="0.01"
+          />
+          <button
+            onclick="addCustomProduct()"
+            class="bg-green-500 text-white px-3 py-1 rounded bob__custom_fields_add"
+          >
+            Aggiungi
+          </button>
+        </div>
+      </div>
+     
+      <!-- 📤 INVIO WHATSAPP -->
+      <button
+        id="send"
+        class="w-full bg-green-600 text-white py-3 rounded text-lg bob__send"
+      >
+        📤 Invia Ordine su WhatsApp
+      </button>
+    </div>
+</div>
+ <!-- END container -->
+
+</div> 
+    <script>
+      // ✅ Versione: 1.2 - 09/07/2025
+
+      // 🧱 MENU BASE
+      const menuItems = [
+        { id: "caffe", name: "☕ Caffè", price: 1.2 },
+        { id: "ginseng_amaro", name: "🥛 Ginseng Amaro", price: 1.5 },
+        { id: "cappuccino", name: "🥛 Cappuccino", price: 1.5 },
+        { id: "cornetto", name: "🥐 Cornetto", price: 1.3 },
+        { id: "succo", name: "🧃 Succo di frutta", price: 1.2 },
+        { id: "te_limone", name: "🍵 Tè al Limone", price: 1.4 },
+        { id: "te_pesca", name: "🍵 Tè alla Pesca", price: 1.4 },
+      ];
+
+      let cart = [];
+      let people = 2;
+      let DEBUG = false;
+      const log = (msg) => {
+        if (DEBUG) console.log(msg);
+      };
+
+      // 🧩 MOSTRA MENU
+      function renderMenu() {
+        const menu = document.getElementById("menu");
+        menu.innerHTML = "";
+        menuItems.forEach((item) => {
+          const box = document.createElement("div");
+          box.className =
+            "bob__menu_prodotto";
+
+          box.innerHTML = `
+          <label class="bob__menu_prodotto_input_label border-2 bg-white mt-6 p-3 rounded shadow flex flex-col justify-between items-center space-y-2 text-center bob__menu_prodotto_label">
+            <input type="checkbox" id="check-${
+              item.id
+            }" class="mr-2 bob__menu_prodotto_input" onchange="toggleQuantity('${item.id}')">
+            <span class="font-medium bob__menu_prodotto_name">${item.name}</span><br>
+            <span class="text-sm text-gray-500 bob__menu_prodotto_price">€${item.price.toFixed(2)}</span>
+          </label>
+          <div class="h-8 flex items-center justify-center w-full bob__menu_prodotto_qtywrap">
+            <input type="number" id="qty-${
+              item.id
+            }" value="1" min="1" class="w-full p-1 text-center border rounded hidden bob__menu_prodotto_qty" onchange="updateCartFromMenu()" />
+          </div>
+        `;
+          menu.appendChild(box);
+        });
+      }
+
+      /* ============================
+    Sezione: Funzione per aggiornare lo stato dei container
+    ============================ */
+  function aggiornaStatoProdottiSelezionati() {
+    const prodotti = document.querySelectorAll('.bob__menu_prodotto_input_label ');
+    prodotti.forEach(div => {
+      const checkbox = div.querySelector('input[type="checkbox"]');
+      if (!checkbox) return;
+
+      if (checkbox.checked) {
+        div.classList.add(
+          'border-2',          // bordo spesso 2px
+          'border-green-500',  // bordo verde medio
+          'bg-green-100'       // sfondo verdino chiaro
+        );
+        log('Selezionato:', div);
+      } else {
+        div.classList.remove(
+          'border-2',
+          'border-green-500',
+          'bg-green-100'
+        );
+        log('Deselezionato:', div);
+      }
+    });
+  }
+
+  /* ============================
+    Sezione: Eventi
+    ============================ */
+  // Aggiorna allo start pagina
+  document.addEventListener('DOMContentLoaded', () => {
+    aggiornaStatoProdottiSelezionati();
+
+    // Aggiorna al cambiamento checkbox
+    document.querySelectorAll('.bob__menu_prodotto input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', aggiornaStatoProdottiSelezionati);
+    });
+  });
+
+      // 📦 MOSTRA/NASCONDI Q.TÀ
+      function toggleQuantity(id) {
+        const qtyInput = document.getElementById("qty-" + id);
+        qtyInput.classList.toggle("hidden");
+        updateCartFromMenu();
+      }
+
+      // 🛒 AGGIORNA CARRELLO DA MENU
+      function updateCartFromMenu() {
+        cart = [];
+
+        menuItems.forEach((item) => {
+          const check = document.getElementById("check-" + item.id);
+          const qtyInput = document.getElementById("qty-" + item.id);
+          const qty = parseInt(qtyInput?.value || 0);
+
+          if (check?.checked && qty > 0) {
+            cart.push({ name: item.name, price: item.price, quantity: qty });
+          }
+        });
+
+        updateCart();
+      }
+
+      // 🛍️ AGGIORNA VISUALIZZAZIONE CARRELLO
+      function updateCart() {
+        const cartDiv = document.getElementById("cartItems");
+        cartDiv.innerHTML = "";
+
+        let total = 0;
+        cart.forEach((item) => {
+          const subTotal = item.price * item.quantity;
+          total += subTotal;
+
+          const row = document.createElement("div");
+          row.className = "bob__cart_item";
+          row.innerHTML = `${item.quantity}x ${item.name} - €${subTotal.toFixed(
+            2
+          )}`;
+          cartDiv.appendChild(row);
+        });
+
+        document.getElementById("total").textContent = total.toFixed(2);
+
+        if (document.getElementById("splitToggle").checked) {
+          document.getElementById("splitInfo").classList.remove("hidden");
+          document.getElementById("splitTotal").textContent = (
+            total / people
+          ).toFixed(2);
+        } else {
+          document.getElementById("splitInfo").classList.add("hidden");
+        }
+      }
+
+      // 👥 NUMERO PERSONE
+      function adjustPeople(delta) {
+        people = Math.max(1, people + delta);
+        document.getElementById("peopleCount").textContent = people;
+        updateCart();
+      }
+
+      // 🔁 SWITCH ROMANA
+      document.getElementById("splitToggle").addEventListener("change", (e) => {
+        document
+          .getElementById("splitControls")
+          .classList.toggle("hidden", !e.target.checked);
+        updateCart();
+      });
+
+      // ➕ PRODOTTI PERSONALIZZATI
+      function toggleCustomFields() {
+        const el = document.getElementById("customFields");
+        el.classList.toggle("hidden");
+      }
+
+      function addCustomProduct() {
+        const name = document.getElementById("customName").value.trim();
+        const price = parseFloat(document.getElementById("customPrice").value);
+        if (!name || isNaN(price)) return alert("Compila entrambi i campi.");
+
+        cart.push({ name: `✨ ${name}`, price, quantity: 1 });
+        updateCart();
+
+        document.getElementById("customName").value = "";
+        document.getElementById("customPrice").value = "";
+      }
+
+      // 📤 INVIA ORDINE WHATSAPP
+      function sendOrder() {
+        if (cart.length === 0) return alert("Il carrello è vuoto!");
+
+        const lines = cart
+          .map((item) => `- ${item.quantity}x ${item.name}`)
+          .join("\n");
+        let msg = `Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n${lines}`;
+        if (document.getElementById("splitToggle").checked) {
+          msg += `\n\nTotale diviso tra ${people} persone.`;
+        }
+        msg += "\n\nGrazie mille! 🙏";
+        const url = `https://web.whatsapp.com/send?text=${encodeURIComponent(
+          msg
+        )}`;
+        window.open(url, "_blank");
+      }
+
+      // ▶️ AVVIO
+      renderMenu();
+      document.getElementById("send").addEventListener("click", sendOrder);
+    </script>
+  </body>
+</html>
