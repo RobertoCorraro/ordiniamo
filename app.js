@@ -30,7 +30,7 @@
 
           box.innerHTML = `
           <!-- Blocco BOX del prodotto  -->
-          <label class="bob__menu_prodotto_input_label w-full max-w-64 border-2 bg-white mt-6 p-3 rounded shadow flex flex-col justify-between items-center space-y-2 text-center bob__menu_prodotto_label">
+          <label class="bob__menu_prodotto_input_label w-full border-2 bg-white mt-6 p-3 rounded shadow flex flex-col justify-between items-center space-y-2 text-center bob__menu_prodotto_label">
             <input type="checkbox" id="check-${
               item.id
             }" class="mr-2 bob__menu_prodotto_input" onchange="toggleQuantity('${item.id}')">
