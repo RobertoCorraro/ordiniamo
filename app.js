@@ -26,7 +26,7 @@
         menuItems.forEach((item) => {
           const box = document.createElement("div");
           box.className =
-            "bob__menu_prodotto flex flex-row w-full justify-between gap-x-6 py-5";
+            "bob__menu_prodotto flex flex-col w-full justify-between gap-x-6 py-5";
 
           box.innerHTML = `
           <!-- Blocco BOX del prodotto  -->
