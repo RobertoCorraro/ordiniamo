@@ -2,5 +2,14 @@
 Style
 *****/
 
+.bob__menu_prodotto {
+    MIN-HEIGHT: 82PX;
+}
 
-.bob__menu_prodotto_input {display:none}
+.bob__menu_prodotto_qtywrap.prodotto_non_aggiunto {
+    display: none;
+}
+
+.bob__menu_prodotto_input {
+    display: none;
+}

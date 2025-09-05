@@ -16,11 +16,27 @@
     <h1 class="text-2xl font-bold text-center mt-20 mb-6 bob__title">☕ Il Baaaaaaaar</h1>
 
     <!-- 📦 CONTAINER PRINCIPALE -->
-    <div class="max-w-2xl mx-auto bob__container">
-      <!-- 🍽️ SEZIONE MENU A GRIGLIA -->
-      <div id="menu" class="flex-col divide-y gap-4 mb-8 bob__menu">
+    <div class="max-w-5xl mx-auto bob__container">
+      <div class="flex">
+        <!-- 🛍️ CONTAINER PRODOTTI -->
+        <div id="container_prodotti" class="w-5/6 p-4">
+          <h2 class="text-lg font-semibold mb-4">Prodotti</h2>
+          <div class="grid grid-cols-3 gap-2 bob__menu" id="menu">
+              <!-- Prodotti -->
+          </div>
+        </div>
 
-        <!-- Prodotti -->
+        <!-- 🛒 CONTAINER CARRELLO -->
+         
+        <div id="container_carrello" class="w-1/6">
+          <h2 class="text-lg font-semibold mb-9">Carrello</h2>
+          <div id="cartItems" class="space-y-1 text-sm min-h-100 p-4 bg-white rounded shadow" style="min-height: 300px;">
+            <!-- Gli elementi del carrello verranno aggiunti qui dinamicamente -->
+          </div>
+          <p class="mt-4 font-bold text-lg bob__total">
+            <strong>TOT:</strong> €<span id="total">0.00</span>
+          </p>
+        </div>
       </div>
 
       <!-- 🧮 SWITCH DIVISIONE ALLA ROMANA -->
@@ -39,24 +55,6 @@
         <button onclick="adjustPeople(1)" class="px-2 py-1 bg-gray-300 rounded bob__split_controls_btn">
           +
         </button>
-      </div>
-
-      <!-- 🛒 CARRELLO -->
-      <div class="bg-white p-4 rounded shadow space-y-3 mb-6 bob__cart">
-        <h2 class="text-lg font-semibold mb-2 bob__cart_title">🛒 Carrello</h2>
-        <div id="cartItems" class="space-y-1 text-sm bob__cart_items min-h-100">
-          <!-- Gli elementi del carrello verranno aggiunti qui dinamicamente -->
-        </div>
-        <p class="bob__cart_total">
-          <strong>TOT:</strong> €<span id="total" class="bob__cart_total_value">0.00</span>
-        </p>
-        <div id="splitInfo" class="hidden bob__cart_splitinfo">
-          <p class="bob__cart_splitinfo_text">
-            <strong>Totale per persona:</strong> €<span id="splitTotal" class="bob__cart_splitinfo_value"
-              >0.00</span
-            >
-          </p>
-        </div>
       </div>
 
       <!-- ➕ PRODOTTO PERSONALIZZATO -->
