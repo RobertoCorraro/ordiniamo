@@ -1,15 +1,9 @@
-/****
-Style
-*****/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-.bob__menu_prodotto {
-    MIN-HEIGHT: 82PX;
+body {
+    font-family: 'Inter', sans-serif;
 }
 
-.bob__menu_prodotto_qtywrap.prodotto_non_aggiunto {
-    display: none;
-}
-
-.bob__menu_prodotto_input {
-    display: none;
+#whatsapp-container {
+    z-index: 100;
 }

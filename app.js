@@ -1,5 +1,10 @@
 // ✅ Versione: 1.2 - 09/07/2025
 
+// 🛠️ Variabili customizzabili per l'invio del messaggio
+const WHATSAPP_PHONE_NUMBER = "1234567890"; // Numero di telefono destinatario
+const MESSAGE_HEADER = "Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n"; // Testo prima dell'elenco prodotti
+const MESSAGE_FOOTER = "\n\nGrazie mille! 🙏"; // Testo dopo l'elenco prodotti
+
 // 🧱 MENU BASE
 const menuItems = [
   { id: "caffe", name: "☕ Caffè", price: 1.2 },
@@ -12,169 +17,70 @@ const menuItems = [
   { id: "te_pesca", name: "🍵 Tè alla Pesca", price: 1.4 },
 ];
 
-let cart = [];
 let people = 2;
 let DEBUG = false;
 const log = (msg) => {
   if (DEBUG) console.log(msg);
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('whatsapp-number').textContent = WHATSAPP_PHONE_NUMBER;
+  renderMenu();
+  updateCart(); // Initial cart update
+
+  document.getElementById("send").addEventListener("click", sendOrder);
+
+  document.getElementById("splitToggle").addEventListener("change", (e) => {
+    document.getElementById("splitControls").classList.toggle("hidden", !e.target.checked);
+    updateCart();
+  });
+
+  document.addEventListener('cartchange', renderMenu);
+});
+
 // 🧩 MOSTRA MENU
 function renderMenu() {
   const menu = document.getElementById("menu");
   menu.innerHTML = "";
   menuItems.forEach((item) => {
+    const cartItem = cart.find(cartItem => cartItem.name === item.name);
+
     const box = document.createElement("div");
-    box.className =
-      "bob__menu_prodotto flex flex-col justify-between rounded";
+    box.className = "bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300";
+    box.setAttribute('data-product-id', item.id);
+
+    let buttonHtml;
+    if (cartItem) {
+      buttonHtml = `
+        <div class="flex items-center">
+          <button onclick="removeFromCart('${cartItem.name}')" class="text-gray-500 hover:text-gray-700 px-2">
+            <i class="fa fa-minus"></i>
+          </button>
+          <span class="font-bold text-lg text-gray-800 mx-2">${cartItem.quantity}</span>
+          <button onclick="addToCart('${item.id}')" class="text-gray-500 hover:text-gray-700 px-2">
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+      `;
+    } else {
+      buttonHtml = `
+        <button onclick="addToCart('${item.id}')" class="bg-green-500 text-white w-10 h-10 rounded-full font-bold hover:bg-green-600 transition-colors duration-300 flex items-center justify-center">
+          <i class="fa fa-plus"></i>
+        </button>
+      `;
+    }
 
     box.innerHTML = `
-      <!-- Blocco BOX del prodotto  -->
-      <label class="bob__menu_prodotto_input_label w-full border-2 bg-white flex items-center justify-between p-2">
-        <div class="flex items-center">
-          <input type="checkbox" id="check-${item.id}" class="mr-2 bob__menu_prodotto_input" onchange="toggleQuantity('${item.id}')">
-          <span class="font-medium bob__menu_prodotto_name">${item.name}</span>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+        <p class="text-gray-500 mt-1">€${item.price.toFixed(2)}</p>
+        <div class="mt-4 flex justify-end">
+          ${buttonHtml}
         </div>
-        <span class="text-sm text-gray-500 bob__menu_prodotto_price">€${item.price.toFixed(2)}</span>
-      </label>
-      <div class="h-8 flex items-center justify-center w-full bob__menu_prodotto_qtywrap hidden">
-        <button onclick="adjustQuantity('${item.id}', -1)" class="px-2 py-1 bg-gray-300 rounded">-</button>
-        <input type="number" id="qty-${item.id}" value="1" min="1" class="w-12 p-1 text-center border rounded bob__menu_prodotto_qty" onchange="updateCartFromMenu()" />
-        <button onclick="adjustQuantity('${item.id}', 1)" class="px-2 py-1 bg-gray-300 rounded">+</button>
       </div>
     `;
     menu.appendChild(box);
   });
-}
-
-/* ============================
-Sezione: Funzione per aggiornare lo stato dei container
-============================ */
-function aggiornaStatoProdottiSelezionati() {
-  const prodotti = document.querySelectorAll('.bob__menu_prodotto_input_label ');
-  prodotti.forEach(div => {
-    const checkbox = div.querySelector('input[type="checkbox"]');
-    if (!checkbox) return;
-
-    if (checkbox.checked) {
-      div.classList.add(
-        'border-2',          // bordo spesso 2px
-        'border-green-500',  // bordo verde medio
-        'bg-green-100',      // sfondo verdino chiaro
-        'prodotto_aggiunto'       // sfondo verdino chiaro
-      ),
-        div.classList.remove(
-          'prodotto_non_aggiunto'
-        );
-      log('Selezionato:', div);
-    } else {
-      div.classList.remove(
-        //  'border-2',
-        'border-green-500',
-        'bg-green-100',
-        'prodotto_aggiunto'
-      );
-      log('Deselezionato:', div);
-    }
-  });
-}
-
-/* ============================
-  Sezione: Eventi
-  ============================ */
-// Aggiorna allo start pagina
-document.addEventListener('DOMContentLoaded', () => {
-  aggiornaStatoProdottiSelezionati();
-
-  // Aggiorna al cambiamento checkbox
-  document.querySelectorAll('.bob__menu_prodotto input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', aggiornaStatoProdottiSelezionati);
-  });
-});
-
-// 🔼🔽 ADJUST QUANTITY
-function adjustQuantity(id, delta) {
-  const qtyInput = document.getElementById("qty-" + id);
-  const currentQty = parseInt(qtyInput.value) || 0;
-  const newQty = Math.max(0, currentQty + delta);
-  qtyInput.value = newQty;
-  updateCartFromMenu();
-}
-
-// 📦 MOSTRA/NASCONDI Q.TÀ
-function toggleQuantity(id) {
-  const qtyWrap = document.getElementById("qty-" + id).closest(".bob__menu_prodotto_qtywrap");
-  const checkbox = document.getElementById("check-" + id);
-  if (checkbox.checked) {
-    qtyWrap.classList.remove("hidden");
-    const qtyInput = document.getElementById("qty-" + id);
-    if (parseInt(qtyInput.value) === 0) {
-      qtyInput.value = 1;
-    }
-  } else {
-    qtyWrap.classList.add("hidden");
-    document.getElementById("qty-" + id).value = 0;
-  }
-  updateCartFromMenu();
-}
-
-// 🛒 AGGIORNA CARRELLO DA MENU
-function updateCartFromMenu() {
-  cart = [];
-
-  menuItems.forEach((item) => {
-    const check = document.getElementById("check-" + item.id);
-    const qtyWrap = document.getElementById("qty-" + item.id).closest(".bob__menu_prodotto_qtywrap");
-    const qtyInput = document.getElementById("qty-" + item.id);
-    const qty = parseInt(qtyInput?.value || 0);
-
-    if (check?.checked && qty > 0) {
-      cart.push({ name: item.name, price: item.price, quantity: qty });
-      check.closest(".bob__menu_prodotto_input_label").classList.add(
-        "border-green-500",
-        "bg-green-100"
-      );
-      qtyWrap.classList.remove("hidden");
-    } else {
-      check.closest(".bob__menu_prodotto_input_label").classList.remove(
-        "border-green-500",
-        "bg-green-100"
-      );
-      qtyWrap.classList.add("hidden"); // Ensure the entire qtyWrap is hidden when unchecked
-    }
-  });
-
-  updateCart();
-}
-
-// 🛍️ AGGIORNA VISUALIZZAZIONE CARRELLO
-function updateCart() {
-  const cartDiv = document.getElementById("cartItems");
-  cartDiv.innerHTML = "";
-
-  let total = 0;
-  cart.forEach((item) => {
-    const subTotal = item.price * item.quantity;
-    total += subTotal;
-
-    const row = document.createElement("div");
-    row.className = "bob__cart_item";
-    row.innerHTML = `${item.quantity}x ${item.name} - €${subTotal.toFixed(
-      2
-    )}`;
-    cartDiv.appendChild(row);
-  });
-
-  document.getElementById("total").textContent = total.toFixed(2);
-
-  if (document.getElementById("splitToggle").checked) {
-    document.getElementById("splitInfo").classList.remove("hidden");
-    document.getElementById("splitTotal").textContent = (
-      total / people
-    ).toFixed(2);
-  } else {
-    document.getElementById("splitInfo").classList.add("hidden");
-  }
 }
 
 // 👥 NUMERO PERSONE
@@ -183,14 +89,6 @@ function adjustPeople(delta) {
   document.getElementById("peopleCount").textContent = people;
   updateCart();
 }
-
-// 🔁 SWITCH ROMANA
-document.getElementById("splitToggle").addEventListener("change", (e) => {
-  document
-    .getElementById("splitControls")
-    .classList.toggle("hidden", !e.target.checked);
-  updateCart();
-});
 
 // ➕ PRODOTTI PERSONALIZZATI
 function toggleCustomFields() {
@@ -210,6 +108,35 @@ function addCustomProduct() {
   document.getElementById("customPrice").value = "";
 }
 
+// ➕ MODAL NUOVO PRODOTTO
+function openAddProductModal() {
+  document.getElementById('addProductModal').classList.remove('hidden');
+}
+
+function closeAddProductModal() {
+  document.getElementById('addProductModal').classList.add('hidden');
+}
+
+function addNewProduct() {
+  const name = document.getElementById('newProductName').value.trim();
+  const price = parseFloat(document.getElementById('newProductPrice').value);
+
+  if (!name || isNaN(price)) {
+    alert('Per favore, inserisci un nome e un prezzo validi.');
+    return;
+  }
+
+  const newProduct = {
+    id: name.toLowerCase().replace(/\s+/g, '-'),
+    name: name,
+    price: price,
+  };
+
+  menuItems.push(newProduct);
+  renderMenu();
+  closeAddProductModal();
+}
+
 // 📤 INVIA ORDINE WHATSAPP
 function sendOrder() {
   if (cart.length === 0) return alert("Ouh, a durmì ste!! Il carrello è vuoto.");
@@ -217,17 +144,13 @@ function sendOrder() {
   const lines = cart
     .map((item) => `- ${item.quantity}x ${item.name}`)
     .join("\n");
-  let msg = `Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n${lines}`;
+  let msg = `${MESSAGE_HEADER}${lines}`;
   if (document.getElementById("splitToggle").checked) {
     msg += `\n\nTotale diviso tra ${people} persone.`;
   }
-  msg += "\n\nGrazie mille! 🙏";
-  const url = `https://wa.me/send?text=${encodeURIComponent(
+  msg += MESSAGE_FOOTER;
+  const url = `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(
     msg
   )}`;
   window.open(url, "_blank");
 }
-
-// ▶️ AVVIO
-renderMenu();
-document.getElementById("send").addEventListener("click", sendOrder);
