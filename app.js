@@ -1,4 +1,4 @@
-// ✅ Versione: 1.2 - 09/07/2025
+// ✅ Versione: 1.3 - 21/10/2025
 
 // 🛠️ Variabili customizzabili per l'invio del messaggio
 const WHATSAPP_PHONE_NUMBER = "1234567890"; // Numero di telefono destinatario
@@ -52,19 +52,19 @@ function renderMenu() {
     let buttonHtml;
     if (cartItem) {
       buttonHtml = `
-        <div class="flex items-center">
-          <button onclick="removeFromCart('${cartItem.name}')" class="text-gray-500 hover:text-gray-700 px-2">
+        <div class="flex justify-between items-center mt-4">
+          <button onclick="removeFromCart('${cartItem.name}')" class="w-[48%] bg-red-500 text-white py-2 rounded-md font-bold hover:bg-red-600 transition-colors duration-300">
             <i class="fa fa-minus"></i>
           </button>
           <span class="font-bold text-lg text-gray-800 mx-2">${cartItem.quantity}</span>
-          <button onclick="addToCart('${item.id}')" class="text-gray-500 hover:text-gray-700 px-2">
+          <button onclick="addToCart('${item.id}')" class="w-[48%] bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
             <i class="fa fa-plus"></i>
           </button>
         </div>
       `;
     } else {
       buttonHtml = `
-        <button onclick="addToCart('${item.id}')" class="bg-green-500 text-white w-10 h-10 rounded-full font-bold hover:bg-green-600 transition-colors duration-300 flex items-center justify-center">
+        <button onclick="addToCart('${item.id}')" class="w-full bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
           <i class="fa fa-plus"></i>
         </button>
       `;
@@ -74,9 +74,10 @@ function renderMenu() {
       <div class="p-4">
         <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
         <p class="text-gray-500 mt-1">€${item.price.toFixed(2)}</p>
-        <div class="mt-4 flex justify-end">
-          ${buttonHtml}
-        </div>
+        <div class="mt-4"></div>
+      </div>
+      <div class="p-4">
+        ${buttonHtml}
       </div>
     `;
     menu.appendChild(box);
