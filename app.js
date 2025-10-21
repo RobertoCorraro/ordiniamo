@@ -1,7 +1,7 @@
 // ✅ Versione: 1.3 - 21/10/2025
 
 // 🛠️ Variabili customizzabili per l'invio del messaggio
-const WHATSAPP_PHONE_NUMBER = "1234567890"; // Numero di telefono destinatario
+const WHATSAPP_PHONE_NUMBER = "+393881137272"; // Numero di telefono destinatario
 const MESSAGE_HEADER = "Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n"; // Testo prima dell'elenco prodotti
 const MESSAGE_FOOTER = "\n\nGrazie mille! 🙏"; // Testo dopo l'elenco prodotti
 
