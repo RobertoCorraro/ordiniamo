@@ -1,12 +1,12 @@
-// ✅ Versione: 1.3 - 21/10/2025
+// ✅ Versione: 1.4 - Supabase Integration
 
-// 🛠️ Variabili customizzabili per l'invio del messaggio
-const WHATSAPP_PHONE_NUMBER = "+393881137272"; // Numero di telefono destinatario
-const MESSAGE_HEADER = "Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n"; // Testo prima dell'elenco prodotti
-const MESSAGE_FOOTER = "\n\nGrazie mille! 🙏"; // Testo dopo l'elenco prodotti
+// 🛠️ Variabili (modificabili da Supabase)
+let WHATSAPP_PHONE_NUMBER = "+393881137272"; 
+const MESSAGE_HEADER = "Ciao Amici del BAR! 🍽️\nVorremmo ordinare:\n\n"; 
+const MESSAGE_FOOTER = "\n\nGrazie mille! 🙏"; 
 
-// 🧱 MENU BASE
-const menuItems = [
+// 🧱 MENU BASE (Fallback)
+let menuItems = [
   { id: "caffe", name: "☕ Caffè", price: 1.2 },
   { id: "ginseng_amaro", name: "☕ Ginseng Amaro", price: 1.5 },
   { id: "zucchero_di_canna", name: "☕ Zucchero di Canna", price: 1.5 },
@@ -23,10 +23,50 @@ const log = (msg) => {
   if (DEBUG) console.log(msg);
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// Inizializzazione App e Supabase
+async function initApp() {
+  try {
+    if (typeof supabase !== 'undefined') {
+       const { createClient } = supabase;
+       // SUPABASE_URL e SUPABASE_ANON_KEY sono definiti in config.js
+       if (typeof SUPABASE_URL !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes("tuo-project-id")) {
+           const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+           
+           // 1. Carica Impostazioni Bar
+           const { data: settings } = await sb.from('bar_settings').select('*').single();
+           if (settings) {
+               WHATSAPP_PHONE_NUMBER = settings.phone_number;
+               if (settings.bar_name) {
+                   const titleEl = document.querySelector('h1');
+                   if (titleEl) titleEl.innerText = "☕ " + settings.bar_name;
+               }
+           }
+
+           // 2. Carica Prodotti
+           const { data: products } = await sb.from('products').select('*').eq('is_available', true);
+           if (products && products.length > 0) {
+               menuItems = products.map(p => ({
+                   id: p.id,
+                   name: p.name,
+                   price: parseFloat(p.price)
+               }));
+           }
+       } else {
+           console.log("Supabase non configurato in config.js. Uso dati locali.");
+       }
+    }
+  } catch (error) {
+    console.error("Errore init Supabase:", error);
+  }
+
+  // Aggiorna UI
   document.getElementById('whatsapp-number').textContent = WHATSAPP_PHONE_NUMBER;
   renderMenu();
-  updateCart(); // Initial cart update
+  updateCart();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
 
   document.getElementById("send").addEventListener("click", sendOrder);
 

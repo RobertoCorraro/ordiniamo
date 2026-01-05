@@ -29,6 +29,7 @@ Il progetto è realizzato con tecnologie web standard, senza necessità di build
 /
 ├── index.html          # Punto di ingresso dell'applicazione (UI principale)
 ├── app.js              # Logica principale: inizializzazione, rendering menu, eventi
+├── config.js           # Configurazione Supabase (API Key e URL)
 ├── cart.js             # Gestione dello stato del carrello e calcoli
 ├── single-product.js   # Componenti per la visualizzazione dei singoli prodotti
 ├── style.css           # Stili CSS personalizzati aggiuntivi
@@ -62,6 +63,24 @@ const menuItems = [
   // ... aggiungi altri prodotti
 ];
 ```
+
+### 3. Integrazione Backend (Supabase) - Opzionale
+
+Se vuoi gestire il menu e il numero di telefono dinamicamente senza modificare il codice, puoi collegare un database **Supabase** (gratuito).
+
+1.  **Crea un progetto su Supabase**: Vai su [supabase.com](https://supabase.com) e crea un nuovo progetto.
+2.  **Imposta il Database**: Vai nell'SQL Editor di Supabase e incolla il contenuto del file `supabase_setup.sql` presente in questo repository. Questo creerà le tabelle `bar_settings` e `products` con i dati iniziali.
+3.  **Configura l'App**:
+    *   Apri il file `config.js`.
+    *   Inserisci il tuo `SUPABASE_URL` e `SUPABASE_ANON_KEY` (li trovi nelle impostazioni del progetto Supabase -> API).
+
+```javascript
+// config.js
+const SUPABASE_URL = "https://tuo-progetto.supabase.co";
+const SUPABASE_ANON_KEY = "tua-chiave-anon-public";
+```
+
+Se Supabase non è configurato, l'app continuerà a funzionare usando i dati predefiniti in `app.js`.
 
 ## 🌐 Deploy
 
