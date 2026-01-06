@@ -43,3 +43,14 @@ CREATE POLICY "Enable read access for all users" ON bar_settings
 
 CREATE POLICY "Enable read access for all users" ON products
     FOR SELECT USING (true);
+
+-- 6. Abilita scrittura pubblica (ATTENZIONE: Solo per demo/test)
+-- Permette a chiunque abbia la chiave anonima (quindi anche l'app admin) di modificare i dati.
+-- La "sicurezza" è delegata solo all'accesso alla pagina admin.html protetta da password JS.
+
+CREATE POLICY "Enable insert for all users" ON bar_settings FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update for all users" ON bar_settings FOR UPDATE USING (true);
+
+CREATE POLICY "Enable insert for all users" ON products FOR INSERT WITH CHECK (true);
+CREATE POLICY "Enable update for all users" ON products FOR UPDATE USING (true);
+CREATE POLICY "Enable delete for all users" ON products FOR DELETE USING (true);

@@ -26,10 +26,11 @@ const log = (msg) => {
 // Inizializzazione App e Supabase
 async function initApp() {
   try {
-    if (typeof supabase !== 'undefined') {
+    if (typeof supabase !== 'undefined' && typeof window.APP_CONFIG !== 'undefined') {
        const { createClient } = supabase;
-       // SUPABASE_URL e SUPABASE_ANON_KEY sono definiti in config.js
-       if (typeof SUPABASE_URL !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes("tuo-project-id")) {
+       const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.APP_CONFIG;
+
+       if (SUPABASE_URL && !SUPABASE_URL.includes("tuo-project-id")) {
            const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
            
            // 1. Carica Impostazioni Bar
@@ -37,8 +38,8 @@ async function initApp() {
            if (settings) {
                WHATSAPP_PHONE_NUMBER = settings.phone_number;
                if (settings.bar_name) {
-                   const titleEl = document.querySelector('h1');
-                   if (titleEl) titleEl.innerText = "☕ " + settings.bar_name;
+                   const barNameEl = document.getElementById('bar-name-display');
+                   if (barNameEl) barNameEl.textContent = settings.bar_name;
                }
            }
 
@@ -85,36 +86,52 @@ function renderMenu() {
   menuItems.forEach((item) => {
     const cartItem = cart.find(cartItem => cartItem.name === item.name);
 
+    // [BLOCK] Product Card Container
+    // Rappresenta la scheda del singolo prodotto nella griglia
     const box = document.createElement("div");
-    box.className = "bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300";
+    // Added class: js-product-card
+    box.className = "js-product-card flex justify-between bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300";
     box.setAttribute('data-product-id', item.id);
 
     let buttonHtml;
     if (cartItem) {
+      // [STATE] Product In Cart
+      // Mostra i controlli +/- quando il prodotto è già nel carrello
       buttonHtml = `
-        <div class="flex justify-between items-center mt-4">
-          <button onclick="removeFromCart('${cartItem.name}')" class="w-[48%] bg-red-500 text-white py-2 rounded-md font-bold hover:bg-red-600 transition-colors duration-300">
+        <!-- [SECTION] Cart Controls (Product In Cart) -->
+        <div class="js-cart-controls flex justify-between items-center">
+          <!-- Button: Decrease Quantity -->
+          <button style="min-width: 48px;" onclick="removeFromCart('${cartItem.name}')" class="js-decrease-btn w-[48%] bg-red-500 text-white py-2 rounded-md font-bold hover:bg-red-600 transition-colors duration-300">
             <i class="fa fa-minus"></i>
           </button>
-          <span class="font-bold text-lg text-gray-800 mx-2">${cartItem.quantity}</span>
-          <button onclick="addToCart('${item.id}')" class="w-[48%] bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
+          
+          <!-- Display: Quantity -->
+          <span class="js-quantity-display font-bold text-lg text-gray-800 mx-2">${cartItem.quantity}</span>
+          
+          <!-- Button: Increase Quantity -->
+          <button style="min-width: 48px;"  onclick="addToCart('${item.id}')" class="js-increase-btn w-[48%] bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
             <i class="fa fa-plus"></i>
           </button>
         </div>
       `;
     } else {
+      // [STATE] Product Not In Cart
+      // Mostra solo il bottone "Aggiungi"
       buttonHtml = `
-        <button onclick="addToCart('${item.id}')" class="w-full bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
+        <!-- [SECTION] Add Button (Product Not In Cart) -->
+        <button style="min-width: 48px;" onclick="addToCart('${item.id}')" class="js-add-to-cart-btn w-full bg-green-500 text-white py-2 rounded-md font-bold hover:bg-green-600 transition-colors duration-300">
           <i class="fa fa-plus"></i>
         </button>
       `;
     }
 
+    // [SECTION] Product Info & Actions
     box.innerHTML = `
-      <div class="p-4">
-        <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
-        <p class="text-gray-500 mt-1">€${item.price.toFixed(2)}</p>
-        <div class="mt-4"></div>
+      <div class="p-4 flex flex-row justify-between">
+        <!-- Product Name -->
+        <h3 style="line-height: 1;" class="pt-1 js-product-name text-lg font-semibold text-gray-800">${item.name}</h3>
+        <!-- Product Price -->
+        <p style="line-height: 1" class="ml-2 js-product-price text-gray-500 mt-1">€${item.price.toFixed(2)}</p>
       </div>
       <div class="p-4">
         ${buttonHtml}

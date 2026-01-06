@@ -17,26 +17,33 @@
       referrerpolicy="no-referrer"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen p-4 font-sans">
-    <!-- 📞 WHATSAPP NUMBER -->
-    <div
-      id="whatsapp-container"
-      class="top-4 text-center right-4 bg-white p-3 rounded-lg shadow-lg"
-    >
-      <span class="font-bold text-gray-700 text-center">Ordine da inviare al num:</span>
-      <span id="whatsapp-number" class="text-green-500 font-bold"></span>
+  <body class="bg-gray-100 min-h-screen p-4 font-sans pb-32 md:pb-4">
+    <!-- HEADER WRAPPER -->
+    <div class="max-w-6xl mx-auto pt-10 mt-10 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-8 px-4">
+      
+      <!-- 🧾 TITOLO -->
+      <header class="text-center md:text-left w-full md:w-1/2">
+        <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
+          ☕ Ordini per il Bar
+        </h1>
+        <p class="text-gray-500 mt-2">Semplice, veloce e senza stress!</p>
+      </header>
+
+      <!-- 📞 WHATSAPP NUMBER -->
+      <div
+        id="whatsapp-container"
+        class="w-full md:w-2/6 bg-white p-4 rounded-lg shadow-lg"
+      >
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <span class="block font-bold text-gray-700">Ordiniamo da:</span>
+          <span id="bar-name-display" class="block font-bold text-green-600 text-lg"></span>
+          <span class="text-xs text-gray-400">TEL<span id="whatsapp-number"></span></span>
+        </div>
+      </div>
+
     </div>
-
-    <!-- 🧾 TITOLO -->
-    <header class="text-center pt-10 mt-10 mb-8">
-      <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
-        ☕ Ordini per il Bar
-      </h1>
-      <p class="text-gray-500 mt-2">Semplice, veloce e senza stress!</p>
-    </header>
-
     <!-- 📦 CONTAINER PRINCIPALE -->
-    <main class="max-w-6xl mx-auto p-4 bg-white rounded-2xl shadow-xl">
+    <main class="max-w-6xl mx-auto p-4 rounded-2xl shadow-xl">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- 🛍️ CONTAINER PRODOTTI -->
         <div class="md:col-span-2">
@@ -44,7 +51,7 @@
             Ciò a ma pgghiè?
           </h2>
           <div
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-6"
             id="menu"
           >
             <!-- Prodotti caricati da app.js -->
@@ -52,7 +59,7 @@
         </div>
 
         <!-- 🛒 CONTAINER CARRELLO -->
-        <div class="bg-gray-50 p-6 rounded-xl shadow-inner">
+        <div class="bg-white p-6 rounded-xl shadow-inner">
           <h2 class="text-2xl font-bold text-gray-700 mb-6">Il tuo carrello</h2>
           <div id="cartItems" class="space-y-4">
             <!-- Elementi del carrello -->
@@ -146,13 +153,23 @@
       </div>
 
       <!-- 📤 INVIO WHATSAPP -->
-      <div class="mt-8 text-center">
-        <button
-          id="send"
-          class="w-full max-w-md mx-auto bg-green-600 text-white py-4 rounded-xl text-lg font-bold hover:bg-green-700 shadow-lg"
-        >
-          Invia Ordine su WhatsApp
-        </button>
+      <div class="fixed bottom-0 left-0 w-full bg-white p-4 border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 md:static md:bg-transparent md:p-0 md:border-none md:shadow-none md:mt-8 md:text-center">
+        <div class="flex items-center justify-between gap-4 max-w-md mx-auto md:block">
+            
+            <!-- Mobile Total Display -->
+            <div class="flex-1 md:hidden text-left">
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-wide">Totale</p>
+                <p class="text-2xl font-extrabold text-gray-800 leading-none">€<span id="mobileTotal">0.00</span></p>
+            </div>
+
+            <button
+            id="send"
+            class="flex-initial w-2/3 md:w-full md:max-w-md bg-green-600 text-white py-3 md:py-4 rounded-xl text-lg font-bold hover:bg-green-700 shadow-lg md:shadow-lg"
+            >
+            <i class="fab fa-whatsapp mr-1"> </i>Invia <span class="hidden sm:inline">Ordine al Bar</span> </i>
+            </button>
+            <span class="block p-1 mt-2 text-sm text-gray-400">Si apre WhatsApp e devi dare solo l'Invio.</span>
+        </div>
       </div>
     </main>
 

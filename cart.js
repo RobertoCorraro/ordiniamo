@@ -8,6 +8,9 @@ function updateCart() {
   if (cart.length === 0) {
     cartDiv.innerHTML = '<p class="text-gray-400">Il carrello è vuoto.</p>';
     document.getElementById("total").textContent = "0.00";
+    const mobileTotalEl = document.getElementById("mobileTotal");
+    if (mobileTotalEl) mobileTotalEl.textContent = "0.00";
+
     document.getElementById("splitInfo").classList.add("hidden");
     return;
   }
@@ -35,6 +38,12 @@ function updateCart() {
   });
 
   document.getElementById("total").textContent = total.toFixed(2);
+  
+  // Aggiorna anche il totale mobile se presente
+  const mobileTotalEl = document.getElementById("mobileTotal");
+  if (mobileTotalEl) {
+      mobileTotalEl.textContent = total.toFixed(2);
+  }
 
   if (document.getElementById("splitToggle").checked) {
     document.getElementById("splitInfo").classList.remove("hidden");
